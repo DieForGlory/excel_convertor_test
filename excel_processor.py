@@ -5,9 +5,8 @@ from thefuzz import fuzz
 
 import dictionary_matcher
 import value_dictionary_handler
-from dadata_service import apply_post_processing
 from utils import normalize_header, get_col_from_cell
-
+from local_geocoding_service import apply_post_processing
 
 def _apply_manual_rules(source_ws, template_ws, rules, s_start_row, t_start_row, used_source_cols, used_template_cols,
                         visible_rows_only):

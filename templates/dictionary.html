@@ -8,7 +8,7 @@
     <p>Научите систему понимать синонимы. Например, если вы добавите "Имя клиента" как основное имя, а "ФИО@1!Покупатель@1!Заказчик" как синонимы, система будет знать, что это одно и то же.</p>
 
     <div class="item-card" style="margin-top: 2rem;">
-        <form action="{{ url_for('dictionaries.add_to_dictionary') }}" method="POST" style="width:100%">
+        <form id="dictionary-form" action="{{ url_for('dictionaries.add_to_dictionary') }}" method="POST" style="width:100%">
             <h3>Добавить или обновить запись</h3>
             <div class="form-group">
                 <label for="canonical_name">Основное, "правильное" название заголовка</label>
@@ -18,7 +18,7 @@
                 <label for="synonyms">Синонимы (через разделитель @1!)</label>
                 <input type="text" id="synonyms" name="synonyms" placeholder="Например, ФИО@1!Покупатель@1!Заказчик">
             </div>
-            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="submit" class="btn btn-primary">Сохранить запись</button>
         </form>
     </div>
 
@@ -32,7 +32,8 @@
                     <p style="color: #6c757d;">Синонимы: {{ synonyms|join('@1!') }}</p>
                 </div>
                 <div class="item-card-actions">
-                    <form action="{{ url_for('dictionaries.delete_from_dictionary') }}" method="POST" onsubmit="return confirm('Удалить эту запись?');">
+                    <button type="button" class="btn btn-secondary btn-sm edit-btn" data-canonical="{{ canonical }}" data-synonyms="{{ synonyms|join('@1!') }}">Редактировать</button>
+                    <form action="{{ url_for('dictionaries.delete_from_dictionary') }}" method="POST" onsubmit="return confirm('Удалить эту запись?');" style="display: inline;">
                         <input type="hidden" name="canonical_name" value="{{ canonical }}">
                         <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
                     </form>
