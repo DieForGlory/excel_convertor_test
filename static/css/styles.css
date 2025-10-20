@@ -9,7 +9,9 @@
     --text-color: #333;
     --border-color: #dbe2e8;
     --success-color: #28a745;
+    --success-hover-color: #218838;
     --error-color: #dc3545;
+    --error-hover-color: #c82333;
     --font-family: 'Montserrat', sans-serif;
     --border-radius: 8px;
     --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -46,22 +48,23 @@ h1, h2, h3 {
 a {
     color: var(--primary-color);
     text-decoration: none;
-    transition: color 0.3s ease;
+    transition: color 0.2s;
 }
 
 a:hover {
     color: var(--primary-hover-color);
+    text-decoration: underline;
 }
 
 /* --- 2. Навигация --- */
 .navbar {
-    background: var(--background-color);
+    background-color: var(--background-color);
     padding: 1rem 2rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
 }
 
 .navbar .logo {
@@ -70,41 +73,92 @@ a:hover {
     color: var(--primary-color);
 }
 
-.navbar .nav-links a {
-    margin-left: 1.5rem;
-    font-weight: 500;
-    font-size: 1rem;
+.navbar .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
 }
 
-/* --- 3. Формы --- */
+/* --- 3. Кнопки (Отрефакторено) --- */
+/* Общий базовый стиль для всех кнопок */
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid transparent;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+/* Модификатор для основной кнопки */
+.btn-primary {
+    color: #fff;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.btn-primary:hover {
+    background-color: var(--primary-hover-color);
+    border-color: var(--primary-hover-color);
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Модификатор для вторичной кнопки */
+.btn-secondary {
+    color: var(--text-color);
+    background-color: #e9ecef;
+    border-color: #e9ecef;
+}
+.btn-secondary:hover {
+    background-color: #dbe2e8;
+    border-color: #dbe2e8;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+/* Модификатор для кнопки успеха */
+.btn-success {
+    color: #fff;
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+.btn-success:hover {
+    background-color: var(--success-hover-color);
+    border-color: var(--success-hover-color);
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Модификатор для кнопки опасности */
+.btn-danger {
+    color: #fff;
+    background-color: var(--error-color);
+    border-color: var(--error-color);
+}
+.btn-danger:hover {
+    background-color: var(--error-hover-color);
+    border-color: var(--error-hover-color);
+    color: #fff;
+    text-decoration: none;
+}
+
+/* --- 4. Формы --- */
 fieldset {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     padding: 1.5rem;
     margin-bottom: 2rem;
-    background: #fafcfe;
 }
 
 legend {
     padding: 0 0.5rem;
     font-weight: 600;
-    font-size: 1.2rem;
     color: var(--primary-color);
-    display: flex;
-    align-items: center;
-}
-
-.legend-icon {
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    background-color: var(--primary-color);
-    color: white;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 30px;
-    margin-right: 0.5rem;
-    font-weight: 700;
+    font-size: 1.2rem;
 }
 
 .form-group {
@@ -114,145 +168,72 @@ legend {
 .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: 500;
+    font-weight: 600;
 }
 
-.form-group input[type="text"],
-.form-group input[type="file"],
-.form-group select {
+.form-control,
+select,
+input[type="text"],
+input[type="file"] {
+    display: block;
     width: 100%;
-    padding: 0.8rem;
+    padding: 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-color);
+    background-color: #fff;
+    background-clip: padding-box;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    font-size: 1rem;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-.form-group input:focus, .form-group select:focus {
-    outline: none;
+.form-control:focus,
+select:focus,
+input[type="text"]:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
 }
 
 .checkbox-group {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
 }
-.checkbox-group input {
+
+.checkbox-group input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* --- 5. Элементы интерфейса --- */
+.legend-icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 0.9rem;
     margin-right: 0.5rem;
 }
 
-
-/* --- 4. Кнопки --- */
-.btn {
-    display: inline-block;
-    padding: 0.8rem 1.5rem;
-    border: none;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-}
-
-.btn-primary {
-    background-color: var(--primary-color);
-    color: white;
-}
-.btn-primary:hover {
-    background-color: var(--primary-hover-color);
-}
-
-.btn-secondary {
-    /* --- ИЗМЕНЕНИЕ: Новый, более приятный цвет --- */
-    background-color: #5a67d8; /* Индиго */
-    color: white;
-}
-.btn-secondary:hover {
-    background-color: #434190;
-}
-
-.btn-success {
-    background-color: var(--success-color);
-    color: white;
-}
-
-.btn-danger {
-    background-color: var(--error-color);
-    color: white;
-}
-
-.btn-sm {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-}
-
-
-/* --- 5. Динамические правила --- */
-#manual-rules-container .rule-row {
-    display: flex;
-    gap: 1.5rem; /* Увеличили отступ */
-    align-items: center;
-    margin-bottom: 1.5rem;
-    background-color: #f8f9fa; /* Легкий фон */
-    padding: 1rem;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
-}
-
-.rule-input-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.rule-input-group label {
-    font-size: 0.8rem;
-    color: #6c757d;
-    margin-bottom: 0.25rem;
-    text-transform: uppercase;
-    font-weight: 600;
-}
-
-.rule-input-group input {
-    width: 100%;
-    padding: 0.6rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-}
-
-.rule-arrow {
-    font-size: 1.5rem;
-    color: var(--primary-color);
-    font-weight: 600;
-    padding-top: 1.2rem; /* Для выравнивания с полями */
-}
-
-/* --- 6. Статус и прогресс-бар --- */
+/* --- 6. Прогресс-бар --- */
 #progress-container {
     margin-top: 2rem;
-    padding: 1.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
 }
 
 .progress-bar-background {
-    width: 100%;
     background-color: var(--secondary-color);
     border-radius: var(--border-radius);
-    overflow: hidden;
-    margin: 1rem 0;
+    padding: 3px;
 }
 
 .progress-bar-foreground {
     height: 20px;
-    width: 0%;
     background-color: var(--success-color);
     border-radius: var(--border-radius);
     transition: width 0.4s ease;
@@ -267,16 +248,19 @@ legend {
     padding: 0;
     margin-bottom: 1rem;
 }
+
 .flash-messages li {
     padding: 1rem;
     margin-bottom: 1rem;
     border-radius: var(--border-radius);
 }
+
 .flash-messages .success {
     background-color: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;
 }
+
 .flash-messages .error {
     background-color: #f8d7da;
     color: #721c24;
@@ -306,8 +290,10 @@ legend {
     box-shadow: var(--box-shadow);
     padding: 1.5rem;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -316,11 +302,16 @@ legend {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-.item-card-content h3 {
-    margin: 0 0 0.5rem 0;
+.item-card-content {
+    flex: 1 1 300px;
 }
 
 .item-card-actions {
     display: flex;
     gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.item-card h3 {
+    margin-top: 0;
 }

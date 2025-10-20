@@ -7,6 +7,64 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedTemplateSelect = document.getElementById('saved_template');
     const newTemplateFields = document.getElementById('new-template-fields');
 
+    // ----- НАЧАЛО ИСПРАВЛЕНИЙ -----
+    const addRuleButton = document.getElementById('add-manual-rule');
+    const rulesContainer = document.getElementById('manual-rules-container');
+
+    if (addRuleButton) {
+        addRuleButton.addEventListener('click', function() {
+            // 1. Создаем главный контейнер для правила
+            const ruleDiv = document.createElement('div');
+            // Задаем стили, чтобы элементы внутри него выстроились в ряд
+            ruleDiv.style.display = 'flex';
+            ruleDiv.style.alignItems = 'center';
+            ruleDiv.style.gap = '10px';
+            ruleDiv.style.marginBottom = '1rem';
+
+            // 2. Создаем и настраиваем все элементы по отдельности
+            const sourceInput = document.createElement('input');
+            sourceInput.type = 'text';
+            sourceInput.name = 'manual_source_col'; // <-- Исправление #1: добавляем имя
+            sourceInput.placeholder = 'Колонка источника (напр. A)';
+            sourceInput.className = 'form-control';
+            sourceInput.style.width = 'auto'; // <-- Исправление #2: отменяем 'width: 100%' из CSS
+            sourceInput.style.flex = '1';
+
+            const arrow = document.createElement('span');
+            arrow.textContent = '→';
+            arrow.style.fontWeight = 'bold';
+
+            const templateInput = document.createElement('input');
+            templateInput.type = 'text';
+            templateInput.name = 'manual_template_col'; // <-- Исправление #1: добавляем имя
+            templateInput.placeholder = 'Колонка шаблона (напр. C)';
+            templateInput.className = 'form-control';
+            templateInput.style.width = 'auto'; // <-- Исправление #2: отменяем 'width: 100%' из CSS
+            templateInput.style.flex = '1';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-danger remove-rule-btn';
+            removeBtn.textContent = '×';
+
+            // 3. Добавляем созданные элементы в контейнер
+            ruleDiv.appendChild(sourceInput);
+            ruleDiv.appendChild(arrow);
+            ruleDiv.appendChild(templateInput);
+            ruleDiv.appendChild(removeBtn);
+
+            rulesContainer.appendChild(ruleDiv);
+        });
+
+        // Логика для кнопки удаления
+        rulesContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-rule-btn')) {
+                e.target.parentElement.remove();
+            }
+        });
+    }
+    // ----- КОНЕЦ ИСПРАВЛЕНИЙ -----
+
     if (savedTemplateSelect) {
         savedTemplateSelect.addEventListener('change', function() {
             newTemplateFields.style.display = this.value ? 'none' : 'block';
@@ -37,83 +95,47 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.error) {
                     throw new Error(data.error);
                 }
-                pollStatus(data.task_id);
+                if (data.task_id) {
+                    pollStatus(data.task_id);
+                }
             })
             .catch(error => {
-                progressContainer.style.display = 'none';
-                errorContainer.textContent = `Произошла ошибка: ${error.message}`;
+                errorContainer.textContent = 'Произошла ошибка: ' + error.message;
                 errorContainer.style.display = 'block';
+                progressContainer.style.display = 'none';
             });
         });
     }
 
     function pollStatus(taskId) {
-        const statusUrl = `/status/${taskId}`;
+        const statusText = document.getElementById('status-text');
+        const progressBar = document.getElementById('progress-bar');
+        const downloadLink = document.getElementById('download-link');
+
         const interval = setInterval(() => {
-            fetch(statusUrl)
-            .then(response => response.json())
-            .then(data => {
-                const statusBar = document.getElementById('progress-bar');
-                const statusText = document.getElementById('status-text');
+            fetch(`/status/${taskId}`)
+                .then(response => response.json())
+                .then(data => {
+                    statusText.textContent = data.status || 'Обработка...';
+                    progressBar.style.width = (data.progress || 0) + '%';
 
-                statusText.textContent = data.status || 'Обработка...';
-                const progress = data.progress || 0;
-                statusBar.style.width = `${progress}%`;
-                statusBar.textContent = `${progress}%`;
-
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    if (data.result_file) {
-                        const downloadLink = document.getElementById('download-link');
-                        downloadLink.href = `/download/${data.result_file}`;
-                        downloadLink.style.display = 'inline-block';
-                        statusText.textContent = 'Готово! Ваш файл можно скачать.';
-                    } else if(data.status && data.status.startsWith('Ошибка')) {
-                        statusBar.style.backgroundColor = 'var(--error-color)';
+                    if (data.progress >= 100) {
+                        clearInterval(interval);
+                        if (data.result_file) {
+                            downloadLink.href = `/download/${data.result_file}`;
+                            downloadLink.textContent = `Скачать результат (${data.result_file})`;
+                            downloadLink.style.display = 'block';
+                        }
                     }
-                }
-            })
-            .catch(() => {
-                clearInterval(interval);
-                document.getElementById('status-text').textContent = 'Ошибка получения статуса.';
-            });
-        }, 1500);
+                })
+                .catch(error => {
+                    clearInterval(interval);
+                    statusText.textContent = 'Ошибка при проверке статуса.';
+                });
+        }, 2000);
     }
 
-    // --- Логика для страниц создания/редактирования шаблонов ---
-    const addManualRuleBtn = document.getElementById('add-manual-rule');
-    const manualRulesContainer = document.getElementById('manual-rules-container');
-
-    if (addManualRuleBtn) {
-        addManualRuleBtn.addEventListener('click', function() {
-            const ruleRow = document.createElement('div');
-            ruleRow.className = 'rule-row';
-            // Исправлены имена полей на 'source_cell' и 'template_col'
-            ruleRow.innerHTML = `
-                <div class="rule-input-group">
-                    <label>Из ячейки</label>
-                    <input type="text" name="source_cell" placeholder="A1" required>
-                </div>
-                <div class="rule-arrow">→</div>
-                <div class="rule-input-group">
-                    <label>В колонку</label>
-                    <input type="text" name="template_col" placeholder="B" required>
-                </div>
-                <button type="button" class="btn btn-danger btn-sm remove-rule-btn" style="align-self: center; margin-top: 1rem;">Удалить</button>
-            `;
-            manualRulesContainer.appendChild(ruleRow);
-        });
-    }
-
-    if (manualRulesContainer) {
-        manualRulesContainer.addEventListener('click', function(e) {
-            if (e.target && e.target.classList.contains('remove-rule-btn')) {
-                e.target.closest('.rule-row').remove();
-            }
-        });
-    }
-
-    // --- Логика для страниц словарей ---
+    // --- Логика для других страниц ---
     const dictionaryForm = document.getElementById('dictionary-form');
     const valueDictionaryForm = document.getElementById('value-dictionary-form');
 

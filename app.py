@@ -8,7 +8,7 @@ from routes import register_routes
 
 def create_app():
     """
-    Создает и конфигурирует экземпляр приложения Flask.
+    Создает и конфигурирует экземпляр приложения Flask. qwe
     """
     app = Flask(__name__)
 
