@@ -96,7 +96,7 @@ def edit(template_id):
             with open(json_path, 'w', encoding='utf-8') as f:
                 json.dump(template_data, f, ensure_ascii=False, indent=4)
             flash("Шаблон успешно обновлен!", "success")
-            return redirect(url_for('templates.list'))
+            return redirect(url_for('templates.edit', template_id=template_id))
         except Exception as e:
             flash(f"Ошибка при обновлении: {e}", "error")
             return redirect(url_for('templates.edit', template_id=template_id))
